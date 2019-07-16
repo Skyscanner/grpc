@@ -166,7 +166,7 @@ def check_and_update_cythonization(extensions):
     return True
 
 
-def try_cythonize(extensions, linetracing=False, mandatory=True):
+def try_cythonize(extensions, linetracing=False, mandatory=True, compile_time_env=None):
     """Attempt to cythonize the extensions.
 
   Args:
@@ -199,7 +199,8 @@ def try_cythonize(extensions, linetracing=False, mandatory=True):
             for extension in extensions
             for include_dir in extension.include_dirs
         ] + [CYTHON_STEM],
-        compiler_directives=cython_compiler_directives)
+        compiler_directives=cython_compiler_directives,
+        compile_time_env=compile_time_env)
 
 
 class BuildExt(build_ext.build_ext):

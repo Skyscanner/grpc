@@ -46,6 +46,15 @@ IF UNAME_SYSNAME == "Windows":
 ELSE:
     include "_cygrpc/fork_posix.pyx.pxi"
 
+IF ASYNCIO_SUPPORT:
+    include "_cygrpc/aio/iomgr/iomgr.pyx.pxi"
+    include "_cygrpc/aio/iomgr/socket.pyx.pxi"
+    include "_cygrpc/aio/iomgr/timer.pyx.pxi"
+    include "_cygrpc/aio/iomgr/resolver.pyx.pxi"
+    include "_cygrpc/aio/call.pyx.pxi"
+    include "_cygrpc/aio/channel.pyx.pxi"
+
+
 #
 # initialize gRPC
 #
