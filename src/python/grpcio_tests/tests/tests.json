@@ -75,5 +75,10 @@
   "unit.beta._implementations_test.ChannelCredentialsTest",
   "unit.beta._not_found_test.NotFoundTest",
   "unit.beta._utilities_test.ChannelConnectivityTest",
-  "unit.framework.foundation._logging_pool_test.LoggingPoolTest"
+  "unit.framework.foundation._logging_pool_test.LoggingPoolTest",
+  "aio.unit.test_init.TestInsecureChannel",
+  "aio.unit.test_channel.TestUnaryUnaryMultiCallable",
+  "aio.unit.test_channel.TestChannel",
+  "aio.end2end.test_channel.TestChannel",
+  "aio.end2end.test_client.TestClient"
 ]
