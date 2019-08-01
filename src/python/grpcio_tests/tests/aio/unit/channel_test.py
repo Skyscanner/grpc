@@ -7,7 +7,11 @@ from unittest.mock import MagicMock, patch
 from grpc.experimental import aio
 
 
-class TestChannel(unittest.TestCase):
+class ChannelTest(unittest.TestCase):
+    def setUp(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     def test_unary_unary(self):
         async def coro():
             channel = aio.insecure_channel('target:port')
@@ -38,7 +42,11 @@ class TestChannel(unittest.TestCase):
 
 
 
-class TestUnaryUnaryMultiCallable(unittest.TestCase):
+class UnaryUnaryMultiCallableTest(unittest.TestCase):
+    def setUp(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     def test_call(self):
         async def coro():
             channel = aio.insecure_channel('target:port')

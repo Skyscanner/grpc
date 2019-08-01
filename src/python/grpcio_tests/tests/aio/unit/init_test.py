@@ -7,7 +7,11 @@ from unittest.mock import patch
 from grpc.experimental import aio
 
 
-class TestInsecureChannel(unittest.TestCase):
+class InsecureChannelTest(unittest.TestCase):
+    def setUp(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
     def test_insecure_channel(self):
         async def coro():
             channel = aio.insecure_channel('target:port')

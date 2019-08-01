@@ -1,5 +1,10 @@
 [
   "_sanity._sanity_test.SanityTest",
+  "aio.end2end.channel_test.ChannelTest",
+  "aio.end2end.client_test.ClientTest",
+  "aio.unit.channel_test.ChannelTest",
+  "aio.unit.channel_test.UnaryUnaryMultiCallableTest",
+  "aio.unit.init_test.InsecureChannelTest",
   "channelz._channelz_servicer_test.ChannelzServicerTest",
   "fork._fork_interop_test.ForkInteropTest",
   "health_check._health_servicer_test.HealthServicerBackwardsCompatibleWatchTest",
@@ -75,10 +80,5 @@
   "unit.beta._implementations_test.ChannelCredentialsTest",
   "unit.beta._not_found_test.NotFoundTest",
   "unit.beta._utilities_test.ChannelConnectivityTest",
-  "unit.framework.foundation._logging_pool_test.LoggingPoolTest",
-  "aio.unit.test_init.TestInsecureChannel",
-  "aio.unit.test_channel.TestUnaryUnaryMultiCallable",
-  "aio.unit.test_channel.TestChannel",
-  "aio.end2end.test_channel.TestChannel",
-  "aio.end2end.test_client.TestClient"
+  "unit.framework.foundation._logging_pool_test.LoggingPoolTest"
 ]
