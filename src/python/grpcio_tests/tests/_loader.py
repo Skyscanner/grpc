@@ -49,12 +49,8 @@ class Loader(object):
         # measure unnecessarily suffers)
         coverage_context = coverage.Coverage(data_suffix=True)
         coverage_context.start()
-        if sys.version_info >= (3,6):
-            imported_modules = tuple(
-                importlib.import_module(name) for name in names)
-        else:
-            imported_modules = tuple(
-                importlib.import_module(name) for name in names if not name.startswith('aio'))
+        imported_modules = tuple(
+            importlib.import_module(name) for name in names)
         for imported_module in imported_modules:
             self.visit_module(imported_module)
         for imported_module in imported_modules:
@@ -76,8 +72,12 @@ class Loader(object):
     """
         for importer, module_name, is_package in (
                 pkgutil.walk_packages(package_paths)):
-            module = importer.find_module(module_name).load_module(module_name)
-            self.visit_module(module)
+
+
+            module_info = importer.find_module(module_name)
+            if sys.version_info < (3, 6) and 'tests/aio' in module_info.path:
+                continue
+            self.visit_module(module_info.load_module(module_name))
 
     def visit_module(self, module):
         """Visits the module, adding discovered tests to the test suite.

@@ -37,14 +37,15 @@ class SanityTest(unittest.TestCase):
         })
 
         tests_json_string = pkgutil.get_data('tests', 'tests.json')
-        asyncio_tests_json = []
-        if sys.version_info >= (3, 6):
-            asyncio_tests_json_string = pkgutil.get_data('tests', 'asyncio_tests.json')
-            asyncio_tests_json = json.loads(asyncio_tests_json_string.decode()
-                                            if six.PY3 else asyncio_tests_json_string)
-
         tests_json = json.loads(tests_json_string.decode()
                                 if six.PY3 else tests_json_string)
+
+        asyncio_tests_json = []
+        if sys.version_info >= (3, 6):
+          asyncio_tests_json_string = pkgutil.get_data('tests',
+                                                       'asyncio_tests.json')
+          asyncio_tests_json = json.loads(asyncio_tests_json_string.decode()
+                                          if six.PY3 else asyncio_tests_json_string)
 
         self.assertSequenceEqual(tests_json, sorted(tests_json))
         self.assertSequenceEqual(asyncio_tests_json, sorted(asyncio_tests_json))
