@@ -882,6 +882,55 @@ class PythonLanguage(object):
         return 'python'
 
 
+class PythonAsyncioLanguage(PythonLanguage):
+    def test_specs(self):
+        with open(
+                'src/python/grpcio_tests/tests/tests.json') as tests_json_file:
+            with open(
+                    'src/python/grpcio_tests/tests/asyncio_tests.json') as asyncio_tests_json_file:
+                tests_json = json.load(tests_json_file) + json.load(asyncio_tests_json_file)
+        environment = dict(_FORCE_ENVIRON_FOR_WRAPPERS)
+        return [
+            self.config.job_spec(
+                config.run,
+                timeout_seconds=5 * 60,
+                environ=dict(
+                    list(environment.items()) + [(
+                        'GRPC_PYTHON_TESTRUNNER_FILTER', str(suite_name))]),
+                shortname='%s.test.%s' % (config.name, suite_name),
+            ) for suite_name in tests_json for config in self.pythons
+        ]
+
+    def _python_manager_name(self):
+        """Choose the docker image to use based on python version."""
+        if self.args.compiler in [
+                'python3.6', 'python3.7', 'python3.8'
+        ]:
+            return 'stretch_' + self.args.compiler[len('python'):]
+        elif self.args.compiler == 'python_alpine':
+            return 'alpine'
+        else:
+            return 'stretch_3.7'
+
+    def _get_pythons(self, args):
+        if args.compiler not in ('python3.6', 'python3.7', 'python3.8', 'all_the_cpythons'):
+            raise Exception('Compiler %s not supported.' % args.compiler)
+
+        configs = []
+        for config in super()._get_pythons(args):
+            if config.name in (
+                'py36_%s' % args.iomgr_platform,
+                'py37_%s' % args.iomgr_platform,
+                'py38_%s' % args.iomgr_platform
+            ):
+                configs.append(config)
+
+        return configs
+
+    def __str__(self):
+        return 'python_asyncio'
+
+
 class RubyLanguage(object):
 
     def configure(self, config, args):
@@ -1230,6 +1279,7 @@ _LANGUAGES = {
     'php': PhpLanguage(),
     'php7': Php7Language(),
     'python': PythonLanguage(),
+    'python_asyncio': PythonAsyncioLanguage(),
     'ruby': RubyLanguage(),
     'csharp': CSharpLanguage(),
     'objc': ObjCLanguage(),

@@ -1,10 +1,5 @@
 [
   "_sanity._sanity_test.SanityTest",
-  "aio.end2end.channel_test.ChannelTest",
-  "aio.end2end.client_test.ClientTest",
-  "aio.unit.channel_test.ChannelTest",
-  "aio.unit.channel_test.UnaryUnaryMultiCallableTest",
-  "aio.unit.init_test.InsecureChannelTest",
   "channelz._channelz_servicer_test.ChannelzServicerTest",
   "fork._fork_interop_test.ForkInteropTest",
   "health_check._health_servicer_test.HealthServicerBackwardsCompatibleWatchTest",

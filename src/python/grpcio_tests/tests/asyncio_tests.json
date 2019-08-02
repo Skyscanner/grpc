@@ -1,0 +1,7 @@
+[
+  "aio.end2end.channel_test.ChannelTest",
+  "aio.end2end.client_test.ClientTest",
+  "aio.unit.channel_test.ChannelTest",
+  "aio.unit.channel_test.UnaryUnaryMultiCallableTest",
+  "aio.unit.init_test.InsecureChannelTest"
+]

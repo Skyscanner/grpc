@@ -17,6 +17,7 @@ from __future__ import absolute_import
 import importlib
 import pkgutil
 import re
+import sys
 import unittest
 
 import coverage
@@ -48,8 +49,12 @@ class Loader(object):
         # measure unnecessarily suffers)
         coverage_context = coverage.Coverage(data_suffix=True)
         coverage_context.start()
-        imported_modules = tuple(
-            importlib.import_module(name) for name in names)
+        if sys.version_info >= (3,6):
+            imported_modules = tuple(
+                importlib.import_module(name) for name in names)
+        else:
+            imported_modules = tuple(
+                importlib.import_module(name) for name in names if not name.startswith('aio'))
         for imported_module in imported_modules:
             self.visit_module(imported_module)
         for imported_module in imported_modules:
