@@ -882,13 +882,13 @@ class PythonLanguage(object):
         return 'python'
 
 
-class PythonAsyncioLanguage(PythonLanguage):
+class PythonAioLanguage(PythonLanguage):
     def test_specs(self):
         with open(
                 'src/python/grpcio_tests/tests/tests.json') as tests_json_file:
             with open(
-                    'src/python/grpcio_tests/tests/asyncio_tests.json') as asyncio_tests_json_file:
-                tests_json = json.load(tests_json_file) + json.load(asyncio_tests_json_file)
+                    'src/python/grpcio_tests/tests/aio_tests.json') as aio_tests_json_file:
+                tests_json = json.load(tests_json_file) + json.load(aio_tests_json_file)
         environment = dict(_FORCE_ENVIRON_FOR_WRAPPERS)
         return [
             self.config.job_spec(
@@ -928,7 +928,7 @@ class PythonAsyncioLanguage(PythonLanguage):
         return configs
 
     def __str__(self):
-        return 'python_asyncio'
+        return 'python_aio'
 
 
 class RubyLanguage(object):
@@ -1279,7 +1279,7 @@ _LANGUAGES = {
     'php': PhpLanguage(),
     'php7': Php7Language(),
     'python': PythonLanguage(),
-    'python_asyncio': PythonAsyncioLanguage(),
+    'python_aio': PythonAioLanguage(),
     'ruby': RubyLanguage(),
     'csharp': CSharpLanguage(),
     'objc': ObjCLanguage(),

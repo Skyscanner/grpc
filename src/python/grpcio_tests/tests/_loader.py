@@ -75,7 +75,12 @@ class Loader(object):
 
 
             module_info = importer.find_module(module_name)
-            if sys.version_info < (3, 6) and 'tests/aio' in module_info.path:
+            try:
+                module_path = module_info.path
+            except:
+                module_path = module_info.filename
+
+            if sys.version_info < (3, 6) and 'tests/aio' in module_path:
                 continue
             self.visit_module(module_info.load_module(module_name))
 

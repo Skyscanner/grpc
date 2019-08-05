@@ -40,16 +40,16 @@ class SanityTest(unittest.TestCase):
         tests_json = json.loads(tests_json_string.decode()
                                 if six.PY3 else tests_json_string)
 
-        asyncio_tests_json = []
+        aio_tests_json = []
         if sys.version_info >= (3, 6):
-          asyncio_tests_json_string = pkgutil.get_data('tests',
-                                                       'asyncio_tests.json')
-          asyncio_tests_json = json.loads(asyncio_tests_json_string.decode()
-                                          if six.PY3 else asyncio_tests_json_string)
+          aio_tests_json_string = pkgutil.get_data('tests',
+                                                       'aio_tests.json')
+          aio_tests_json = json.loads(aio_tests_json_string.decode()
+                                          if six.PY3 else aio_tests_json_string)
 
         self.assertSequenceEqual(tests_json, sorted(tests_json))
-        self.assertSequenceEqual(asyncio_tests_json, sorted(asyncio_tests_json))
-        self.assertSequenceEqual(sorted(tests_json + asyncio_tests_json), test_suite_names)
+        self.assertSequenceEqual(aio_tests_json, sorted(aio_tests_json))
+        self.assertSequenceEqual(sorted(tests_json + aio_tests_json), test_suite_names)
 
 
 if __name__ == '__main__':
