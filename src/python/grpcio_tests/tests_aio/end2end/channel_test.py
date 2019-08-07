@@ -20,10 +20,10 @@ import unittest
 
 from grpc.experimental import aio
 from src.proto.grpc.testing import messages_pb2
-from tests.aio.end2end import sync_server
+from tests_aio.end2end import sync_server
 
 
-class TestClient(unittest.TestCase):
+class TestChannel(unittest.TestCase):
     def setUp(self):
         self._server = sync_server.Server()
         self._server.start()
@@ -32,19 +32,15 @@ class TestClient(unittest.TestCase):
     def tearDown(self):
         self._server.terminate()
 
-    def test_unary_unary(self):
+    def test_async_context(self):
         async def coro():
-            channel = aio.insecure_channel('localhost:%d' % sync_server.Server.PORT)
-            hi = channel.unary_unary(
-                '/grpc.testing.TestService/UnaryCall',
-                request_serializer=messages_pb2.SimpleRequest.SerializeToString,
-                response_deserializer=messages_pb2.SimpleResponse.FromString
-            )
-            response = await hi(messages_pb2.SimpleRequest())
-
-            self.assertEqual(type(response), messages_pb2.SimpleResponse)
-
-            await channel.close()
+            async with aio.insecure_channel('localhost:%d' % sync_server.Server.PORT) as channel:
+                hi = channel.unary_unary(
+                    '/grpc.testing.TestService/UnaryCall',
+                    request_serializer=messages_pb2.SimpleRequest.SerializeToString,
+                    response_deserializer=messages_pb2.SimpleResponse.FromString
+                )
+                response = await hi(messages_pb2.SimpleRequest())
 
         asyncio.get_event_loop().run_until_complete(coro())
 
