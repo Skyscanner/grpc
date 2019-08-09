@@ -1,0 +1,7 @@
+[
+  "end2end.channel_test.ChannelTest",
+  "end2end.client_test.ClientTest",
+  "unit.channel_test.ChannelTest",
+  "unit.channel_test.UnaryUnaryMultiCallableTest",
+  "unit.init_test.InsecureChannelTest"
+]
