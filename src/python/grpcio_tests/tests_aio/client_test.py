@@ -20,7 +20,7 @@ import unittest
 
 from grpc.experimental import aio
 from src.proto.grpc.testing import messages_pb2
-from tests_aio.end2end import sync_server
+from tests_aio import sync_server
 
 
 class TestClient(unittest.TestCase):

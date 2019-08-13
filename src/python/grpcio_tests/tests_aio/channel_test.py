@@ -20,7 +20,7 @@ import unittest
 
 from grpc.experimental import aio
 from src.proto.grpc.testing import messages_pb2
-from tests_aio.end2end import sync_server
+from tests_aio import sync_server
 
 
 class TestChannel(unittest.TestCase):
@@ -31,6 +31,23 @@ class TestChannel(unittest.TestCase):
 
     def tearDown(self):
         self._server.terminate()
+
+    def test_insecure_channel(self):
+        async def coro():
+            channel = aio.insecure_channel('target:port')
+            self.assertIsInstance(channel, aio.Channel)
+
+        asyncio.get_event_loop().run_until_complete(coro())
+
+    def test_unary_unary_returns_multicallable(self):
+        async def coro():
+            channel = aio.insecure_channel('target:port')
+            self.assertIsInstance(
+                channel.unary_unary('/grpc.testing.TestService/UnaryCall'),
+                aio.UnaryUnaryMultiCallable
+            )
+
+        asyncio.get_event_loop().run_until_complete(coro())
 
     def test_async_context(self):
         async def coro():
