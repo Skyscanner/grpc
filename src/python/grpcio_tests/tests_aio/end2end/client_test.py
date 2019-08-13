@@ -25,6 +25,8 @@ from tests_aio.end2end import sync_server
 
 class TestClient(unittest.TestCase):
     def setUp(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         self._server = sync_server.Server()
         self._server.start()
         aio.init_grpc_aio()
@@ -47,6 +49,7 @@ class TestClient(unittest.TestCase):
             await channel.close()
 
         asyncio.get_event_loop().run_until_complete(coro())
+
 
 if __name__ == '__main__':
     logging.basicConfig()

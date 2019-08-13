@@ -17,7 +17,6 @@ from cpython cimport Py_INCREF, Py_DECREF
 
 from libc cimport string
 
-
 cdef grpc_socket_vtable asyncio_socket_vtable
 cdef grpc_custom_resolver_vtable asyncio_resolver_vtable
 cdef grpc_custom_timer_vtable asyncio_timer_vtable
@@ -153,8 +152,7 @@ cdef void asyncio_run_loop(size_t timeout_ms) with gil:
     pass
 
 
-def init_grpc_aio():
-
+def install_asyncio_iomgr():
     asyncio_resolver_vtable.resolve = asyncio_resolve
     asyncio_resolver_vtable.resolve_async = asyncio_resolve_async
 
@@ -185,4 +183,3 @@ def init_grpc_aio():
         &asyncio_timer_vtable,
         &asyncio_pollset_vtable
     )
-    grpc_init()
