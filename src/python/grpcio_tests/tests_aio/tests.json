@@ -1,4 +1,5 @@
 [
   "channel_test.ChannelTest",
+  "channel_test.InsecureChannelTest",
   "client_test.ClientTest"
 ]

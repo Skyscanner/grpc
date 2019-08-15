@@ -41,6 +41,7 @@ IF ASYNCIO_SUPPORT:
     include "_cygrpc/aio/iomgr/socket.pxd.pxi"
     include "_cygrpc/aio/iomgr/timer.pxd.pxi"
     include "_cygrpc/aio/iomgr/resolver.pxd.pxi"
+    include "_cygrpc/aio/grpc_aio.pxd.pxi"
     include "_cygrpc/aio/callbackcontext.pxd.pxi"
     include "_cygrpc/aio/call.pxd.pxi"
     include "_cygrpc/aio/channel.pxd.pxi"
