@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
+try:
+    import asyncio
+except ImportError:
+    # TODO(https://github.com/grpc/grpc/issues/19728) Improve how Aio Cython is
+    # distributed without breaking none compatible Python versions. For now, if
+    # Asyncio package is not available we just skip it.
+    pass
+
 from cpython cimport Py_INCREF, Py_DECREF
 
 from libc cimport string
