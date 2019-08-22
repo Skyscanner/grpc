@@ -18,6 +18,9 @@ import six
 
 from grpc._cython.cygrpc import init_grpc_aio
 
+from ._channel import Channel
+from ._channel import UnaryUnaryMultiCallable
+
 
 def insecure_channel(target, options=None, compression=None):
     """Creates an insecure asynchronous Channel to a server.
@@ -32,6 +35,15 @@ def insecure_channel(target, options=None, compression=None):
     Returns:
       A Channel.
     """
-    from grpc.experimental.aio import _channel  # pylint: disable=cyclic-import
-    return _channel.Channel(target, ()
-                            if options is None else options, None, compression)
+    return Channel(target, ()
+                   if options is None else options, None, compression)
+
+
+###################################  __all__  #################################
+
+__all__ = (
+    'init_grpc_aio',
+    'Channel',
+    'UnaryUnaryMultiCallable',
+    'insecure_channel',
+)

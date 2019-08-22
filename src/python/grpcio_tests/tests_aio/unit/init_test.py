@@ -77,7 +77,7 @@ class TestInsecureChannel(test_base.AioTestBase):
 
         async def coro():
             channel = aio.insecure_channel(self.server_target)
-            self.assertIsInstance(channel, aio._channel.Channel)
+            self.assertIsInstance(channel, aio.Channel)
 
         self.loop.run_until_complete(coro())
 
