@@ -21,8 +21,8 @@ from concurrent import futures
 import grpc
 
 from grpc.experimental import aio
-from src.proto.grpc.testing import messages_pb2
 from tests_aio.unit import test_base
+from src.proto.grpc.testing import messages_pb2
 
 
 def _grpc_blocking_call(target):

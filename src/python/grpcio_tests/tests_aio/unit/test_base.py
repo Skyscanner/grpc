@@ -23,7 +23,7 @@ from tests_aio.unit import sync_server
 def _get_free_loopback_tcp_port():
     if socket.has_ipv6:
         tcp_socket = socket.socket(socket.AF_INET6)
-        host="::1"
+        host = "::1"
         host_target = "[::1]"
     else:
         tcp_socket = socket.socket(socket.AF_INET)

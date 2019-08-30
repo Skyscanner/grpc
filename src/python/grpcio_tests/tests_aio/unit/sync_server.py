@@ -54,8 +54,7 @@ class Server(multiprocessing.Process):
     def _start_server(host_and_port):
         server = grpc.server(
             futures.ThreadPoolExecutor(max_workers=1),
-            options=(('grpc.so_reuseport', 1),)
-        )
+            options=(('grpc.so_reuseport', 1),))
         test_pb2_grpc.add_TestServiceServicer_to_server(TestServiceServicer(),
                                                         server)
         server.add_insecure_port(host_and_port)
