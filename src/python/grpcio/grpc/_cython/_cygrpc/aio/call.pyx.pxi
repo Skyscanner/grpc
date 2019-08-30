@@ -118,7 +118,7 @@ cdef class _AioCall:
         receive_status_on_client_operation.c()
         ops[5] = <grpc_op> receive_status_on_client_operation.c_op
 
-        self._waiter_call = asyncio.get_running_loop().create_future()
+        self._waiter_call = asyncio.get_event_loop().create_future()
 
         call_status = grpc_call_start_batch(
             call,

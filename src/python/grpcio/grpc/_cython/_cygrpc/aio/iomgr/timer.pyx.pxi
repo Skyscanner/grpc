@@ -24,7 +24,7 @@ cdef class _AsyncioTimer:
         timer = _AsyncioTimer()
         timer._grpc_timer = grpc_timer
         timer._deadline = deadline
-        timer._timer_handler = asyncio.get_running_loop().call_later(deadline, timer._on_deadline)
+        timer._timer_handler = asyncio.get_event_loop().call_later(deadline, timer._on_deadline)
         timer._active = 1
         return timer
 
