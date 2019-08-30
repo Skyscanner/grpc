@@ -23,11 +23,16 @@ from tests_aio.unit import sync_server
 def _get_free_loopback_tcp_port():
     if socket.has_ipv6:
         tcp_socket = socket.socket(socket.AF_INET6)
+        host="::1"
+        host_target = "[::1]"
     else:
         tcp_socket = socket.socket(socket.AF_INET)
-    tcp_socket.bind(('', 0))
+        host = "127.0.0.1"
+        host_target = host
+    tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    tcp_socket.bind((host, 0))
     address_tuple = tcp_socket.getsockname()
-    return tcp_socket, "127.0.0.1:%s" % (address_tuple[1])
+    return tcp_socket, "%s:%s" % (host_target, address_tuple[1])
 
 
 class AioTestBase(unittest.TestCase):
