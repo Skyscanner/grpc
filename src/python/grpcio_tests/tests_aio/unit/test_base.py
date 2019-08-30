@@ -27,7 +27,7 @@ def _get_free_loopback_tcp_port():
         tcp_socket = socket.socket(socket.AF_INET)
     tcp_socket.bind(('', 0))
     address_tuple = tcp_socket.getsockname()
-    return tcp_socket, "localhost:%s" % (address_tuple[1])
+    return tcp_socket, "127.0.0.1:%s" % (address_tuple[1])
 
 
 class AioTestBase(unittest.TestCase):

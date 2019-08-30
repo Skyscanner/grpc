@@ -14,6 +14,7 @@
 
 import asyncio
 import logging
+import os
 import unittest
 
 from concurrent import futures
@@ -35,6 +36,7 @@ def _grpc_blocking_call(target):
 
 
 def _grpc_aio_call(target):
+
     async def coro():
         aio.init_grpc_aio()
         async with aio.insecure_channel(target) as channel:
@@ -60,11 +62,13 @@ class TestInitGrpcAio(test_base.AioTestBase):
     # We double check that once the Aio is initialized a fork syscall can
     # be executed and the child process can use the both versions of
     # the gRPC library.
+    @unittest.skipIf(os.name == 'nt', 'fork not supported on windows')
     def test_aio_supports_fork_and_grpc_blocking_usable(self):
         successful_call = self.loop.run_until_complete(
             _run_in_another_process(_grpc_blocking_call, self.server_target))
         self.assertEqual(successful_call, True)
 
+    @unittest.skipIf(os.name == 'nt', 'fork not supported on windows')
     def test_aio_supports_fork_and_grpc_aio_usable(self):
         successful_call = self.loop.run_until_complete(
             _run_in_another_process(_grpc_aio_call, self.server_target))

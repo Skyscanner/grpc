@@ -37,8 +37,10 @@ class Server(multiprocessing.Process):
     implicitly the grpc using the synchronous configuration. Both worlds
     can not coexist within the same process.
     """
+
     def __init__(self, host_and_port):
-        super(Server, self).__init__(target=Server._start_server, args=(host_and_port,))
+        super(Server, self).__init__(
+            target=Server._start_server, args=(host_and_port,))
 
     def start(self):
         super(Server, self).start()
