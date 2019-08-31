@@ -41,6 +41,8 @@ pyx_library(
         "_cygrpc/grpc_gevent.pxd.pxi",
         "_cygrpc/grpc_gevent.pyx.pxi",
         "_cygrpc/grpc_string.pyx.pxi",
+        "_cygrpc/iomgr.pxd.pxi,
+        "_cygrpc/iomgr.pyd.pxi,
         "_cygrpc/metadata.pxd.pxi",
         "_cygrpc/metadata.pyx.pxi",
         "_cygrpc/operation.pxd.pxi",
