@@ -32,8 +32,6 @@ def _get_free_loopback_tcp_port():
 
 class AioTestBase(unittest.TestCase):
 
-    CALL_DELAY = sync_server.TestServiceServicer.CALL_DELAY
-
     @classmethod
     def setUpClass(cls):
         cls._socket, cls._target = _get_free_loopback_tcp_port()

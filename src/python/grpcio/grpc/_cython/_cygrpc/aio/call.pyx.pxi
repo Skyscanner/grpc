@@ -12,12 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import grpc
 cimport cpython
+import grpc
 
 _EMPTY_FLAGS = 0
 _EMPTY_METADATA = ()
 _OP_ARRAY_LENGTH = 6
+
+
+def _build_rpc_error(initial_metadata, code, details, trailing_metadata):
+
+    class _RpcError(grpc.RpcError, grpc.Future, grpc.Call):  # pylint: disable=too-many-ancestors
+
+        def __init__(self, initial_metadata, code, details, trailing_metadata):
+            self._initial_metadata = initial_metadata
+            self._code = code
+            self._details = details
+            self._trailing_metadata = trailing_metadata
+
+        def initial_metadata(self):
+            return self._initial_metadata
+
+        def code(self):
+            return self._code
+
+        def details(self):
+            return self._details
+
+        def trailing_metadata(self):
+            return self._trailing_metadata
+
+    return _RpcError(initial_metadata, code, details, trailing_metadata)
 
 
 cdef class _AioCall:
@@ -149,4 +174,9 @@ cdef class _AioCall:
         if receive_status_on_client_operation.code() == GRPC_STATUS_OK:
             return receive_message_operation.message()
 
-        raise grpc.RpcError(receive_status_on_client_operation.error_string())
+        raise _build_rpc_error(
+            receive_status_on_client_operation.error_string(),
+            receive_status_on_client_operation.code(),
+            receive_status_on_client_operation.details(),
+            receive_status_on_client_operation.trailing_metadata(),
+        )
