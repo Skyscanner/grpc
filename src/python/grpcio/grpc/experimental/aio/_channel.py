@@ -38,9 +38,6 @@ class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
         if timeout:
             raise NotImplementedError("TODO: timeout not implemented yet")
 
-        if metadata:
-            raise NotImplementedError("TODO: metadata not implemented yet")
-
         if credentials:
             raise NotImplementedError("TODO: credentials not implemented yet")
 
@@ -52,7 +49,8 @@ class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
             raise NotImplementedError("TODO: compression not implemented yet")
 
         response = await self._channel.unary_unary(
-            self._method, _common.serialize(request, self._request_serializer))
+            self._method, _common.serialize(request, self._request_serializer),
+            metadata)
 
         return _common.deserialize(response, self._response_deserializer)
 

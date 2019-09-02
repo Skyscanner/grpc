@@ -15,7 +15,6 @@
 cimport cpython
 
 _EMPTY_FLAGS = 0
-_EMPTY_METADATA = ()
 _OP_ARRAY_LENGTH = 6
 
 
@@ -59,7 +58,7 @@ cdef class _AioCall:
         else:
             call._waiter_call.set_result(None)
 
-    async def unary_unary(self, method, request):
+    async def unary_unary(self, method, request, metadata=None):
         cdef grpc_call * call
         cdef grpc_slice method_slice
         cdef grpc_op * ops
@@ -94,7 +93,7 @@ cdef class _AioCall:
 
         ops = <grpc_op *>gpr_malloc(sizeof(grpc_op) * _OP_ARRAY_LENGTH)
 
-        initial_metadata_operation = SendInitialMetadataOperation(_EMPTY_METADATA, GRPC_INITIAL_METADATA_USED_MASK)
+        initial_metadata_operation = SendInitialMetadataOperation(metadata, GRPC_INITIAL_METADATA_USED_MASK)
         initial_metadata_operation.c()
         ops[0] = <grpc_op> initial_metadata_operation.c_op
 

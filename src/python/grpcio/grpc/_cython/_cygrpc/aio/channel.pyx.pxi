@@ -25,6 +25,6 @@ cdef class AioChannel:
     def close(self):
         grpc_channel_destroy(self.channel)
 
-    async def unary_unary(self, method, request):
+    async def unary_unary(self, method, request, metadata=None):
         call = _AioCall(self)
-        return await call.unary_unary(method, request)
+        return await call.unary_unary(method, request, metadata)
