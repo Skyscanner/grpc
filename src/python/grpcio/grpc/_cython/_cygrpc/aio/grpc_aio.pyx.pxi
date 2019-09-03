@@ -63,10 +63,16 @@ def init_grpc_aio():
     # event loop, as it is being done by the other Asyncio callbacks.
     Executor.SetThreadingAll(0)
 
-    # gRPC does not execute the fork handles when the iomgr is customized, as
-    # it is the case of Aio which uses the Asyncio one. We install our own ones
-    # for making sure that the forked process is executed in a healthy gRPC
-    # environment.
-    pthread_atfork(&_aio_prefork, &_aio_postfork_parent, &_aio_postfork_child)
+    IF UNAME_SYSNAME != "Windows":
+        # gRPC does not execute the fork handles when the iomgr is customized,
+        # as it is the case of Aio which uses the Asyncio iomgr. We install our
+        # own ones for making sure that the forked process is executed in a
+        # healthy gRPC environment.
+        pthread_atfork(&_aio_prefork, &_aio_postfork_parent, &_aio_postfork_child)
+    ELSE:
+        # There is no support for having a clean and healthy environment after
+        # forking in none posix enviornments. As a result, after a fork the
+        # the behavior is unpredictable.
+        pass
 
     _grpc_aio_initialized = 1

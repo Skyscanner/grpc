@@ -54,7 +54,7 @@ cdef class _AsyncioResolver:
     cdef void resolve(self, char* host, char* port):
         assert not self._task_resolve
 
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         self._task_resolve = asyncio.create_task(
             loop.getaddrinfo(host, port)
         )

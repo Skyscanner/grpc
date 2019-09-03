@@ -49,7 +49,8 @@ class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
             raise NotImplementedError("TODO: credentials not implemented yet")
 
         if wait_for_ready:
-            raise NotImplementedError("TODO: wait_for_ready not implemented yet")
+            raise NotImplementedError(
+                "TODO: wait_for_ready not implemented yet")
 
         if compression:
             raise NotImplementedError("TODO: compression not implemented yet")
