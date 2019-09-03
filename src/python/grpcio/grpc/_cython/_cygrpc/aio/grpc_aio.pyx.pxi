@@ -21,12 +21,10 @@ cdef void _aio_prefork() nogil:
     # shutdown gracefully background threads.
     pass
 
-
 cdef void _aio_postfork_parent() nogil:
     # Since Aio runs with only one thread, the main one. We dont need to
     # restart background threads.
     pass
-
 
 cdef void _aio_postfork_child() nogil:
     # gRPC library is shut down and the default iomgr is installed. The forked
@@ -43,7 +41,6 @@ cdef void _aio_postfork_child() nogil:
         grpc_set_default_iomgr_platform()
 
         _grpc_aio_initialized = 0
-
 
 def init_grpc_aio():
     global _grpc_aio_initialized
