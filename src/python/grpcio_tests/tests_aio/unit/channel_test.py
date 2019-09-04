@@ -62,7 +62,7 @@ class TestChannel(test_base.AioTestBase):
                     response_deserializer=messages_pb2.SimpleResponse.FromString,
                 )
                 timeout = TestServiceServicer.CALL_DELAY / 2
-                with self.assertRaisesRegex(grpc.RpcError, r".*Deadline Exceeded.*") as exception_context:
+                with self.assertRaises(grpc.RpcError) as exception_context:
                     await empty_call_with_sleep(messages_pb2.SimpleRequest(), timeout=timeout)
 
                 status_code, details = grpc.StatusCode.DEADLINE_EXCEEDED.value
