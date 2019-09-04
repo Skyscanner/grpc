@@ -18,8 +18,8 @@ import unittest
 import grpc
 
 from grpc.experimental import aio
-from src.proto.grpc.testing import messages_pb2
 from tests_aio.unit import test_base
+from src.proto.grpc.testing import messages_pb2
 from tests_aio.unit.sync_server import TestServiceServicer
 
 
