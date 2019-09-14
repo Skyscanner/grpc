@@ -1198,6 +1198,17 @@ void grpc_chttp2_add_incoming_goaway(grpc_chttp2_transport* t,
 
 static void maybe_start_some_streams(grpc_chttp2_transport* t) {
   grpc_chttp2_stream* s;
+  /* cancel out streams that haven't yet started if we have received a GOAWAY */
+  if (t->goaway_error != GRPC_ERROR_NONE) {
+    while (grpc_chttp2_list_pop_waiting_for_concurrency(t, &s)) {
+      grpc_chttp2_cancel_stream(
+          t, s,
+          grpc_error_set_int(
+              GRPC_ERROR_CREATE_FROM_STATIC_STRING("GOAWAY received"),
+              GRPC_ERROR_INT_GRPC_STATUS, GRPC_STATUS_UNAVAILABLE));
+    }
+    return;
+  }
   /* start streams where we have free grpc_chttp2_stream ids and free
    * concurrency */
   while (t->next_stream_id <= MAX_CLIENT_STREAM_ID &&
@@ -1226,13 +1237,14 @@ static void maybe_start_some_streams(grpc_chttp2_transport* t) {
     grpc_chttp2_initiate_write(t, GRPC_CHTTP2_INITIATE_WRITE_START_NEW_STREAM);
   }
   /* cancel out streams that will never be started */
-  while (t->next_stream_id >= MAX_CLIENT_STREAM_ID &&
-         grpc_chttp2_list_pop_waiting_for_concurrency(t, &s)) {
-    grpc_chttp2_cancel_stream(
-        t, s,
-        grpc_error_set_int(
-            GRPC_ERROR_CREATE_FROM_STATIC_STRING("Stream IDs exhausted"),
-            GRPC_ERROR_INT_GRPC_STATUS, GRPC_STATUS_UNAVAILABLE));
+  if (t->next_stream_id >= MAX_CLIENT_STREAM_ID) {
+    while (grpc_chttp2_list_pop_waiting_for_concurrency(t, &s)) {
+      grpc_chttp2_cancel_stream(
+          t, s,
+          grpc_error_set_int(
+              GRPC_ERROR_CREATE_FROM_STATIC_STRING("Stream IDs exhausted"),
+              GRPC_ERROR_INT_GRPC_STATUS, GRPC_STATUS_UNAVAILABLE));
+    }
   }
 }
 
@@ -2453,6 +2465,13 @@ static void cancel_stream_cb(void* user_data, uint32_t key, void* stream) {
 }
 
 static void end_all_the_calls(grpc_chttp2_transport* t, grpc_error* error) {
+  intptr_t http2_error;
+  // If there is no explicit grpc or HTTP/2 error, set to UNAVAILABLE on server.
+  if (!t->is_client && !grpc_error_has_clear_grpc_status(error) &&
+      !grpc_error_get_int(error, GRPC_ERROR_INT_HTTP2_ERROR, &http2_error)) {
+    error = grpc_error_set_int(error, GRPC_ERROR_INT_GRPC_STATUS,
+                               GRPC_STATUS_UNAVAILABLE);
+  }
   cancel_stream_cb_args args = {error, t};
   grpc_chttp2_stream_map_for_each(&t->stream_map, cancel_stream_cb, &args);
   GRPC_ERROR_UNREF(error);

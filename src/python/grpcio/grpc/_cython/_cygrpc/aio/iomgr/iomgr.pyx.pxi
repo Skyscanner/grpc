@@ -33,7 +33,7 @@ cdef grpc_error* asyncio_socket_init(
 
 
 cdef void asyncio_socket_destroy(grpc_custom_socket* grpc_socket) with gil:
-    Py_DECREF(<_AsyncioSocket>socket.impl)
+    Py_DECREF(<_AsyncioSocket>grpc_socket.impl)
 
 
 cdef void asyncio_socket_connect(
@@ -51,13 +51,13 @@ cdef void asyncio_socket_close(
         grpc_custom_socket* grpc_socket,
         grpc_custom_close_callback close_cb) with gil:
     socket = (<_AsyncioSocket>grpc_socket.impl)
-    if socket.is_connected():
-        socket.writer.close()
+    socket.close()
     close_cb(grpc_socket)
 
 
 cdef void asyncio_socket_shutdown(grpc_custom_socket* grpc_socket) with gil:
-    raise NotImplemented()
+    socket = (<_AsyncioSocket>grpc_socket.impl)
+    socket.close()
 
 
 cdef void asyncio_socket_write(

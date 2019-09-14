@@ -16,8 +16,8 @@ import logging
 import unittest
 
 from grpc.experimental import aio
-from src.proto.grpc.testing import messages_pb2
 from tests_aio.unit import test_base
+from src.proto.grpc.testing import messages_pb2
 
 
 class TestChannel(test_base.AioTestBase):
