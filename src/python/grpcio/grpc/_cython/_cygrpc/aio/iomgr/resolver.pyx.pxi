@@ -55,7 +55,7 @@ cdef class _AsyncioResolver:
         assert not self._task_resolve
 
         loop = asyncio.get_event_loop()
-        self._task_resolve = asyncio.create_task(
+        self._task_resolve = asyncio.ensure_future(
             loop.getaddrinfo(host, port)
         )
         self._task_resolve.add_done_callback(self._resolve_cb)

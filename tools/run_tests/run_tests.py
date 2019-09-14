@@ -1089,7 +1089,7 @@ class ObjCLanguage(object):
         out = []
         out.append(
             self.config.job_spec(
-                ['src/objective-c/tests/build_one_example.sh'],
+                ['src/objective-c/tests/build_one_example_bazel.sh'],
                 timeout_seconds=10 * 60,
                 shortname='ios-buildtest-example-sample',
                 cpu_cost=1e6,
@@ -1098,10 +1098,11 @@ class ObjCLanguage(object):
                     'EXAMPLE_PATH': 'src/objective-c/examples/Sample',
                     'FRAMEWORKS': 'NO'
                 }))
+        # Currently not supporting compiling as frameworks in Bazel
         out.append(
             self.config.job_spec(
                 ['src/objective-c/tests/build_one_example.sh'],
-                timeout_seconds=10 * 60,
+                timeout_seconds=20 * 60,
                 shortname='ios-buildtest-example-sample-frameworks',
                 cpu_cost=1e6,
                 environ={
@@ -1112,7 +1113,7 @@ class ObjCLanguage(object):
         out.append(
             self.config.job_spec(
                 ['src/objective-c/tests/build_one_example.sh'],
-                timeout_seconds=10 * 60,
+                timeout_seconds=20 * 60,
                 shortname='ios-buildtest-example-switftsample',
                 cpu_cost=1e6,
                 environ={
@@ -1121,7 +1122,7 @@ class ObjCLanguage(object):
                 }))
         out.append(
             self.config.job_spec(
-                ['src/objective-c/tests/build_one_example.sh'],
+                ['src/objective-c/tests/build_one_example_bazel.sh'],
                 timeout_seconds=10 * 60,
                 shortname='ios-buildtest-example-tvOS-sample',
                 cpu_cost=1e6,
@@ -1132,7 +1133,7 @@ class ObjCLanguage(object):
                 }))
         out.append(
             self.config.job_spec(
-                ['src/objective-c/tests/build_one_example.sh'],
+                ['src/objective-c/tests/build_one_example_bazel.sh'],
                 timeout_seconds=20 * 60,
                 shortname='ios-buildtest-example-watchOS-sample',
                 cpu_cost=1e6,
@@ -1150,11 +1151,12 @@ class ObjCLanguage(object):
                 environ=_FORCE_ENVIRON_FOR_WRAPPERS))
         out.append(
             self.config.job_spec(
-                ['test/core/iomgr/ios/CFStreamTests/run_tests.sh'],
+                ['test/core/iomgr/ios/CFStreamTests/build_and_run_tests.sh'],
                 timeout_seconds=20 * 60,
                 shortname='ios-test-cfstream-tests',
                 cpu_cost=1e6,
                 environ=_FORCE_ENVIRON_FOR_WRAPPERS))
+        # TODO: replace with run_one_test_bazel.sh when Bazel-Xcode is stable
         out.append(
             self.config.job_spec(
                 ['src/objective-c/tests/run_one_test.sh'],
@@ -1184,7 +1186,7 @@ class ObjCLanguage(object):
                 }))
         out.append(
             self.config.job_spec(
-                ['test/cpp/ios/run_tests.sh'],
+                ['test/cpp/ios/build_and_run_tests.sh'],
                 timeout_seconds=20 * 60,
                 shortname='ios-cpp-test-cronet',
                 cpu_cost=1e6,
@@ -1216,17 +1218,13 @@ class ObjCLanguage(object):
         return []
 
     def make_targets(self):
-        return ['interop_server']
+        return []
 
     def make_options(self):
         return []
 
     def build_steps(self):
-        return [
-            ['src/objective-c/tests/build_tests.sh'],
-            ['test/core/iomgr/ios/CFStreamTests/build_tests.sh'],
-            ['test/cpp/ios/build_tests.sh'],
-        ]
+        return []
 
     def post_tests_steps(self):
         return []
@@ -1504,6 +1502,13 @@ argp.add_argument(
     default='tests',
     type=str,
     help='Test suite name to use in generated JUnit XML report')
+argp.add_argument(
+    '--report_multi_target',
+    default=False,
+    const=True,
+    action='store_const',
+    help='Generate separate XML report for each test job (Looks better in UIs).'
+)
 argp.add_argument(
     '--quiet_success',
     default=False,
@@ -1912,7 +1917,10 @@ def _build_and_run(check_cancelled,
                                  upload_extra_fields)
         if xml_report and resultset:
             report_utils.render_junit_xml_report(
-                resultset, xml_report, suite_name=args.report_suite_name)
+                resultset,
+                xml_report,
+                suite_name=args.report_suite_name,
+                multi_target=args.report_multi_target)
 
     number_failures, _ = jobset.run(
         post_tests_steps,

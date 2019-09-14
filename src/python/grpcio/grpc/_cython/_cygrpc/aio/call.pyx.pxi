@@ -15,6 +15,7 @@
 cimport cpython
 
 _EMPTY_FLAGS = 0
+_EMPTY_METADATA = ()
 _OP_ARRAY_LENGTH = 6
 
 

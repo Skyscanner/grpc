@@ -95,7 +95,7 @@ cdef class _AsyncioSocket:
     cdef void connect(self, object host, object port, grpc_custom_connect_callback grpc_connect_cb):
         assert not self._task_connect
 
-        self._task_connect = asyncio.create_task(
+        self._task_connect = asyncio.ensure_future(
             asyncio.open_connection(host, port)
         )
         self._grpc_connect_cb = grpc_connect_cb
@@ -104,7 +104,7 @@ cdef class _AsyncioSocket:
     cdef void read(self, char * buffer_, size_t length, grpc_custom_read_callback grpc_read_cb):
         assert not self._task_read
 
-        self._task_read = asyncio.create_task(
+        self._task_read = asyncio.ensure_future(
             self._reader.read(n=length)
         )
         self._grpc_read_cb = grpc_read_cb
@@ -128,3 +128,7 @@ cdef class _AsyncioSocket:
 
     cdef bint is_connected(self):
         return self._reader and not self._reader._transport.is_closing()
+
+    cdef void close(self):
+        if self.is_connected():
+            self._writer.close()
