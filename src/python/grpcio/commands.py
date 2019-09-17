@@ -166,9 +166,7 @@ def check_and_update_cythonization(extensions):
     return True
 
 
-def try_cythonize(extensions,
-                  linetracing=False,
-                  mandatory=True):
+def try_cythonize(extensions, linetracing=False, mandatory=True):
     """Attempt to cythonize the extensions.
 
   Args:
