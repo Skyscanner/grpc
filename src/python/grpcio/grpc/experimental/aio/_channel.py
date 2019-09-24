@@ -99,7 +99,7 @@ class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
         if compression:
             raise NotImplementedError("TODO: compression not implemented yet")
 
-        state = _RPCState(None, None, None, None)
+        state = _RPCState(None, None)
         ops = await self._channel.unary_unary(
             self._method, _common.serialize(request, self._request_serializer),
             metadata)
