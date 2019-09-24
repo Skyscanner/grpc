@@ -18,6 +18,29 @@ from grpc._cython import cygrpc
 from grpc.experimental import aio
 
 
+class _RPCState:
+
+    def __init__(self, initial_metadata, trailing_metadata):
+        self.initial_metadata = initial_metadata
+        self.response = None
+        self.trailing_metadata = trailing_metadata
+
+
+def _handle_call_result(operations, state, response_deserializer):
+    for operation in operations:
+        operation_type = operation.type()
+        if operation_type == cygrpc.OperationType.receive_initial_metadata:
+            state.initial_metadata = operation.initial_metadata()
+        elif operation_type == cygrpc.OperationType.receive_message:
+            serialized_response = operation.message()
+            if serialized_response is not None:
+                response = _common.deserialize(serialized_response,
+                                               response_deserializer)
+                state.response = response
+        elif operation_type == cygrpc.OperationType.receive_status_on_client:
+            state.trailing_metadata = operation.trailing_metadata()
+
+
 class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
 
     def __init__(self, channel, method, request_serializer,
@@ -48,11 +71,41 @@ class UnaryUnaryMultiCallable(aio.UnaryUnaryMultiCallable):
         if compression:
             raise NotImplementedError("TODO: compression not implemented yet")
 
-        response = await self._channel.unary_unary(
+        state = _RPCState(None, None)
+        ops = await self._channel.unary_unary(
             self._method, _common.serialize(request, self._request_serializer),
             metadata)
+        _handle_call_result(ops, state, self._response_deserializer)
 
-        return _common.deserialize(response, self._response_deserializer)
+        return state.response
+
+    async def with_state(self,
+                         request,
+                         timeout=None,
+                         metadata=None,
+                         credentials=None,
+                         wait_for_ready=None,
+                         compression=None):
+        if timeout:
+            raise NotImplementedError("TODO: timeout not implemented yet")
+
+        if credentials:
+            raise NotImplementedError("TODO: credentials not implemented yet")
+
+        if wait_for_ready:
+            raise NotImplementedError(
+                "TODO: wait_for_ready not implemented yet")
+
+        if compression:
+            raise NotImplementedError("TODO: compression not implemented yet")
+
+        state = _RPCState(None, None, None, None)
+        ops = await self._channel.unary_unary(
+            self._method, _common.serialize(request, self._request_serializer),
+            metadata)
+        _handle_call_result(ops, state, self._response_deserializer)
+
+        return state
 
 
 class Channel(aio.Channel):

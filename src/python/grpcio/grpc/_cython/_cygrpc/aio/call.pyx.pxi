@@ -146,4 +146,5 @@ cdef class _AioCall:
             grpc_call_unref(call)
             gpr_free(ops)
 
-        return receive_message_operation.message()
+        return (receive_initial_metadata_operation, receive_message_operation,
+                receive_status_on_client_operation)

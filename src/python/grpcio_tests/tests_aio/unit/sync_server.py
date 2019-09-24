@@ -15,11 +15,27 @@
 import argparse
 
 from concurrent import futures
-from time import sleep
 
 import grpc
 from src.proto.grpc.testing import messages_pb2
 from src.proto.grpc.testing import test_pb2_grpc
+
+
+_INITIAL_METADATA_KEY = "initial-md-key"
+_TRAILING_METADATA_KEY = "trailing-md-key-bin"
+
+
+def _maybe_echo_metadata(servicer_context):
+    """Copies metadata from request to response if it is present."""
+    invocation_metadata = dict(servicer_context.invocation_metadata())
+    if _INITIAL_METADATA_KEY in invocation_metadata:
+        initial_metadatum = (_INITIAL_METADATA_KEY,
+                             invocation_metadata[_INITIAL_METADATA_KEY])
+        servicer_context.send_initial_metadata((initial_metadatum,))
+    if _TRAILING_METADATA_KEY in invocation_metadata:
+        trailing_metadatum = (_TRAILING_METADATA_KEY,
+                              invocation_metadata[_TRAILING_METADATA_KEY])
+        servicer_context.set_trailing_metadata((trailing_metadatum,))
 
 
 # TODO (https://github.com/grpc/grpc/issues/19762)
@@ -27,6 +43,7 @@ from src.proto.grpc.testing import test_pb2_grpc
 class TestServiceServicer(test_pb2_grpc.TestServiceServicer):
 
     def UnaryCall(self, request, context):
+        _maybe_echo_metadata(context)
         return messages_pb2.SimpleResponse()
 
 
