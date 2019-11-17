@@ -142,7 +142,6 @@ def _create_rpc_error(initial_metadata: Optional[MetadataType],
                        status.details(), initial_metadata,
                        status.trailing_metadata())
 
-
 class Call(_base_call.Call):
     _loop: asyncio.AbstractEventLoop
     _code: grpc.StatusCode
@@ -250,7 +249,7 @@ class UnaryUnaryCall(Call, _base_call.UnaryUnaryCall):
     _method: bytes
     _request_serializer: SerializingFunction
     _response_deserializer: DeserializingFunction
-    _call: asyncio.Task
+    _call: Optional[asyncio.Task]
 
     def __init__(self, request: RequestType, deadline: Optional[float],
                  channel: cygrpc.AioChannel, method: bytes,

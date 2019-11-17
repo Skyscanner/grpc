@@ -38,7 +38,7 @@ cdef class AioChannel:
         Returns:
           The response message in bytes.
         """
-        cdef _AioCall call = _AioCall(self)
+        cdef AioCall call = AioCall(self)
         return await call.unary_unary(method,
                                       request,
                                       deadline,
@@ -58,7 +58,7 @@ cdef class AioChannel:
         Returns:
           An async generator that yields raw responses.
         """
-        cdef _AioCall call = _AioCall(self)
+        cdef AioCall call = AioCall(self)
         return call.unary_stream(method,
                                  request,
                                  deadline,

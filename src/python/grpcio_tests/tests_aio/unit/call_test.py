@@ -26,6 +26,7 @@ from src.proto.grpc.testing import test_pb2_grpc
 from tests.unit.framework.common import test_constants
 from tests_aio.unit._test_server import start_test_server
 from tests_aio.unit._test_base import AioTestBase
+from src.proto.grpc.testing import messages_pb2
 
 _NUM_STREAM_RESPONSES = 5
 _RESPONSE_PAYLOAD_SIZE = 42

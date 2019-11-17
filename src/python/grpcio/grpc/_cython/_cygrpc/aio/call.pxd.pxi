@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-cdef class _AioCall:
+cdef class AioCall:
     cdef:
         AioChannel _channel
         list _references
