@@ -28,6 +28,8 @@ from ._typing import (ChannelArgumentType, DeserializingFunction, MetadataType,
                       SerializingFunction)
 from ._utils import _timeout_to_deadline
 
+_IMMUTABLE_EMPTY_TUPLE = tuple()
+
 
 class _BaseMultiCallable:
     """Base class of all multi callable objects.
@@ -104,7 +106,7 @@ class UnaryUnaryMultiCallable(_BaseMultiCallable):
             raise NotImplementedError("TODO: compression not implemented yet")
 
         if metadata is None:
-            metadata = tuple()
+            metadata = _IMMUTABLE_EMPTY_TUPLE
 
         if not self._interceptors:
             return UnaryUnaryCall(
@@ -172,7 +174,7 @@ class UnaryStreamMultiCallable(_BaseMultiCallable):
 
         deadline = _timeout_to_deadline(timeout)
         if metadata is None:
-            metadata = tuple()
+            metadata = _IMMUTABLE_EMPTY_TUPLE
 
         return UnaryStreamCall(
             request,
@@ -230,7 +232,7 @@ class StreamUnaryMultiCallable(_BaseMultiCallable):
 
         deadline = _timeout_to_deadline(timeout)
         if metadata is None:
-            metadata = tuple()
+            metadata = _IMMUTABLE_EMPTY_TUPLE
 
         return StreamUnaryCall(
             request_async_iterator,
@@ -288,7 +290,7 @@ class StreamStreamMultiCallable(_BaseMultiCallable):
 
         deadline = _timeout_to_deadline(timeout)
         if metadata is None:
-            metadata = tuple()
+            metadata = _IMMUTABLE_EMPTY_TUPLE
 
         return StreamStreamCall(
             request_async_iterator,
