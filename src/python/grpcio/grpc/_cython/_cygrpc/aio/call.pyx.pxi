@@ -25,17 +25,6 @@ _UNKNOWN_CANCELLATION_DETAILS = 'RPC cancelled for unknown reason.'
 
 cdef class _AioCall(GrpcCallWrapper):
 
-    def __cinit__(self,
-                  AioChannel channel,
-                  object deadline,
-                  bytes method,
-                  CallCredentials call_credentials):
-        self.call = NULL
-        self._channel = channel
-        self._references = []
-        self._loop = asyncio.get_event_loop()
-        self._create_grpc_call(deadline, method, call_credentials)
-        self._is_locally_cancelled = False
 
     def __dealloc__(self):
         if self.call:
@@ -331,3 +320,15 @@ cdef class _AioCall(GrpcCallWrapper):
             await _receive_initial_metadata(self,
                                             self._loop),
         )
+
+
+cdef _AioCall new_AioCall(AioChannel channel, object deadline, bytes method, CallCredentials call_credentials):
+    cdef _AioCall aio_call
+    aio_call = _AioCall.__new__(_AioCall)
+    aio_call.call = NULL
+    aio_call._channel = channel
+    aio_call._references = []
+    aio_call._loop = asyncio.get_event_loop()
+    aio_call._create_grpc_call(deadline, method, call_credentials)
+    aio_call._is_locally_cancelled = False
+    return aio_call

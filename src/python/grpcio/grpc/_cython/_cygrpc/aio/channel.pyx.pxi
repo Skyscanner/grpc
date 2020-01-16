@@ -112,5 +112,4 @@ cdef class AioChannel:
         else:
             cython_call_credentials = None
 
-        cdef _AioCall call = _AioCall(self, deadline, method, cython_call_credentials)
-        return call
+        return new_AioCall(self, deadline, method, cython_call_credentials)
