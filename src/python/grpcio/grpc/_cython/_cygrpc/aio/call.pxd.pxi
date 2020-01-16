@@ -28,4 +28,15 @@ cdef class _AioCall(GrpcCallWrapper):
         # because Core is holding a pointer for the callback handler.
         bint _is_locally_cancelled
 
+        # Following attributes are used for storing the status of the call and
+        # the initial metadata. Waiters are used for pausing the execution of
+        # tasks that are asking for one of the field when they are not yet
+        # available.
+        object _status
+        object _initial_metadata
+        list _waiters_status
+        list _waiters_initial_metadata
+
     cdef void _create_grpc_call(self, object timeout, bytes method, CallCredentials credentials) except *
+    cdef void _set_status(self, AioRpcStatus status) except *
+    cdef void _set_initial_metadata(self, tuple initial_metadata) except *
