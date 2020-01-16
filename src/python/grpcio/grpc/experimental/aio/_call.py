@@ -158,11 +158,11 @@ class Call(_base_call.Call):
     _locally_cancelled: bool
     _cython_call: cygrpc._AioCall
 
-    def __init__(self, cython_call: cygrpc._AioCall) -> None:
-        self._loop = asyncio.get_event_loop()
+    def __init__(self, cython_call: cygrpc._AioCall, loop: asyncio.AbstractEventLoop) -> None:
+        self._loop = loop
         self._code = None
-        self._status = self._loop.create_future()
-        self._initial_metadata = self._loop.create_future()
+        self._status = loop.create_future()
+        self._initial_metadata = loop.create_future()
         self._locally_cancelled = False
         self._cython_call = cython_call
 
@@ -284,13 +284,14 @@ class UnaryUnaryCall(Call, _base_call.UnaryUnaryCall):
                  credentials: Optional[grpc.CallCredentials],
                  channel: cygrpc.AioChannel, method: bytes,
                  request_serializer: SerializingFunction,
-                 response_deserializer: DeserializingFunction) -> None:
-        super().__init__(channel.call(method, deadline, credentials))
+                 response_deserializer: DeserializingFunction,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        super().__init__(channel.call(method, deadline, credentials), loop)
         self._request = request
         self._metadata = metadata
         self._request_serializer = request_serializer
         self._response_deserializer = response_deserializer
-        self._call = self._loop.create_task(self._invoke())
+        self._call = loop.create_task(self._invoke())
 
     def cancel(self) -> bool:
         if super().cancel():
@@ -358,13 +359,14 @@ class UnaryStreamCall(Call, _base_call.UnaryStreamCall):
                  credentials: Optional[grpc.CallCredentials],
                  channel: cygrpc.AioChannel, method: bytes,
                  request_serializer: SerializingFunction,
-                 response_deserializer: DeserializingFunction) -> None:
-        super().__init__(channel.call(method, deadline, credentials))
+                 response_deserializer: DeserializingFunction,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        super().__init__(channel.call(method, deadline, credentials), loop)
         self._request = request
         self._metadata = metadata
         self._request_serializer = request_serializer
         self._response_deserializer = response_deserializer
-        self._send_unary_request_task = self._loop.create_task(
+        self._send_unary_request_task = loop.create_task(
             self._send_unary_request())
         self._message_aiter = None
 
@@ -452,16 +454,17 @@ class StreamUnaryCall(Call, _base_call.StreamUnaryCall):
                  credentials: Optional[grpc.CallCredentials],
                  channel: cygrpc.AioChannel, method: bytes,
                  request_serializer: SerializingFunction,
-                 response_deserializer: DeserializingFunction) -> None:
-        super().__init__(channel.call(method, deadline, credentials))
+                 response_deserializer: DeserializingFunction,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        super().__init__(channel.call(method, deadline, credentials), loop)
         self._metadata = metadata
         self._request_serializer = request_serializer
         self._response_deserializer = response_deserializer
 
-        self._metadata_sent = asyncio.Event(loop=self._loop)
+        self._metadata_sent = asyncio.Event(loop=loop)
         self._done_writing = False
 
-        self._call_finisher = self._loop.create_task(self._conduct_rpc())
+        self._call_finisher = loop.create_task(self._conduct_rpc())
 
         # If user passes in an async iterator, create a consumer Task.
         if request_async_iterator is not None:
@@ -574,20 +577,21 @@ class StreamStreamCall(Call, _base_call.StreamStreamCall):
                  credentials: Optional[grpc.CallCredentials],
                  channel: cygrpc.AioChannel, method: bytes,
                  request_serializer: SerializingFunction,
-                 response_deserializer: DeserializingFunction) -> None:
-        super().__init__(channel.call(method, deadline, credentials))
+                 response_deserializer: DeserializingFunction,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        super().__init__(channel.call(method, deadline, credentials), loop)
         self._metadata = metadata
         self._request_serializer = request_serializer
         self._response_deserializer = response_deserializer
 
-        self._metadata_sent = asyncio.Event(loop=self._loop)
+        self._metadata_sent = asyncio.Event(loop=loop)
         self._done_writing = False
 
         self._initializer = self._loop.create_task(self._prepare_rpc())
 
         # If user passes in an async iterator, create a consumer coroutine.
         if request_async_iterator is not None:
-            self._async_request_poller = self._loop.create_task(
+            self._async_request_poller = loop.create_task(
                 self._consume_request_iterator(request_async_iterator))
         else:
             self._async_request_poller = None

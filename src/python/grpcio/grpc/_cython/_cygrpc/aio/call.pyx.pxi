@@ -322,13 +322,22 @@ cdef class _AioCall(GrpcCallWrapper):
         )
 
 
-cdef _AioCall new_AioCall(AioChannel channel, object deadline, bytes method, CallCredentials call_credentials):
+cdef _AioCall new_AioCall(AioChannel channel, object deadline,
+                          bytes method, CallCredentials call_credentials):
+    """Instantiate a new _AioCall object.
+
+    Internally uses a raw initialization without using the traditional
+    constructor methods, either __init__ and __cinit__. Since this object
+    won't be instantiated from the Python layer we have full freedom on not
+    providing such methods. By doing this the overhead which would suppose to
+    provide these constructors is circumvented, mainly parsing arguments.
+    """
     cdef _AioCall aio_call
     aio_call = _AioCall.__new__(_AioCall)
     aio_call.call = NULL
     aio_call._channel = channel
+    aio_call._loop = channel.loop
     aio_call._references = []
-    aio_call._loop = asyncio.get_event_loop()
     aio_call._create_grpc_call(deadline, method, call_credentials)
     aio_call._is_locally_cancelled = False
     return aio_call
