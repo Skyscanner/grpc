@@ -25,9 +25,6 @@ cdef class _AsyncioSocket:
         object _task_write
         object _task_connect
         char * _read_buffer
-        # Caches the picked event loop, so we can avoid the 30ns overhead each
-        # time we need access to the event loop.
-        object _loop
 
         # Client-side attributes
         grpc_custom_connect_callback _grpc_connect_cb
@@ -40,7 +37,7 @@ cdef class _AsyncioSocket:
         object _peername
 
         # Caches the IOLoop.
-        object _io_loop
+        _IOLoop _io_loop
 
 
     @staticmethod

@@ -78,6 +78,10 @@ cdef class _IOLoop:
     cdef object asyncio_loop(self):
         return self._asyncio_loop
 
+    cdef object thread_ident(self):
+        return self._thread.ident
+
+
 cdef _IOLoop _current_io_loop():
     global _io_loop
     return _io_loop

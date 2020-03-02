@@ -17,8 +17,10 @@ cdef class _AsyncioTimer:
         grpc_custom_timer * _grpc_timer
         object _deadline
         object _timer_handler
-        object _loop
         int _active
+
+        # Caches the IOLoop.
+        _IOLoop _io_loop
 
     @staticmethod
     cdef _AsyncioTimer create(grpc_custom_timer * grpc_timer, deadline)

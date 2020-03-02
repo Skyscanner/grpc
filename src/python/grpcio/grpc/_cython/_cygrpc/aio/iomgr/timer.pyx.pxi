@@ -18,7 +18,7 @@ cdef class _AsyncioTimer:
         self._grpc_timer = NULL
         self._timer_handler = None
         self._active = 0
-        self._loop = None
+        self._io_loop = None
 
     @staticmethod
     cdef _AsyncioTimer create(grpc_custom_timer * grpc_timer, deadline):
@@ -26,16 +26,22 @@ cdef class _AsyncioTimer:
         timer._grpc_timer = grpc_timer
         timer._deadline = deadline
         timer._active = 1
-        timer._loop = _current_io_loop().asyncio_loop()
+        timer._io_loop = _current_io_loop()
+
+        loop = timer._io_loop.asyncio_loop()
 
         def callback():
             if timer._active == 1:
-                timer._timer_handler = timer._loop.call_later(deadline, timer._on_deadline)
+                timer._timer_handler = loop.call_later(deadline, timer._on_deadline)
 
-        def next_loop_iteration():
-            timer._loop.call_soon_threadsafe(callback)
+        if timer._io_loop.thread_ident() != threading.get_ident():
+            def next_loop_iteration():
+                loop.call_soon_threadsafe(callback)
 
-        asyncio.get_event_loop().call_soon(next_loop_iteration)
+            asyncio.get_event_loop().call_soon(next_loop_iteration)
+        else:
+            callback()
+
         return timer
 
     def _on_deadline(self):
@@ -44,7 +50,7 @@ cdef class _AsyncioTimer:
 
         self._active = 0
         grpc_custom_timer_callback(self._grpc_timer, <grpc_error*>0)
-        _current_io_loop().io_mark()
+        self._io_loop.io_mark()
 
     def __repr__(self):
         class_name = self.__class__.__name__ 
@@ -56,9 +62,14 @@ cdef class _AsyncioTimer:
             return
 
         if self._timer_handler:
-            def next_loop_iteration():
-                self._loop.call_soon_threadsafe(self._timer_handler.cancel)
+            if self._io_loop.thread_ident() != threading.get_ident():
+                loop = self._io_loop.asyncio_loop()
 
-            asyncio.get_event_loop().call_soon(next_loop_iteration)
+                def next_loop_iteration():
+                    loop.call_soon_threadsafe(self._timer_handler.cancel)
+
+                asyncio.get_event_loop().call_soon(next_loop_iteration)
+            else:
+                self._timer_handler.cancel()
 
         self._active = 0

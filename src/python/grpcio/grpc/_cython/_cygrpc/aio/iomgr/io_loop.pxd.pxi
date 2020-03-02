@@ -22,3 +22,4 @@ cdef class _IOLoop:
     cpdef void io_mark(self)
     cdef void io_wait(self, size_t timeout_ms)
     cdef object asyncio_loop(self)
+    cdef object thread_ident(self)
