@@ -66,4 +66,7 @@ cdef class _AsyncioResolver:
             )
             self._task_resolve.add_done_callback(self._resolve_cb)
 
-        self._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            self._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)

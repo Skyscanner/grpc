@@ -32,7 +32,10 @@ cdef class _AsyncioTimer:
             if timer._active == 1:
                 timer._timer_handler = timer._loop.call_later(deadline, timer._on_deadline)
 
-        timer._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            timer._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)
         return timer
 
     def _on_deadline(self):
@@ -53,6 +56,9 @@ cdef class _AsyncioTimer:
             return
 
         if self._timer_handler:
-            self._loop.call_soon_threadsafe(self._timer_handler.cancel)
+            def next_loop_iteration():
+                self._loop.call_soon_threadsafe(self._timer_handler.cancel)
+
+            asyncio.get_event_loop().call_soon(next_loop_iteration)
 
         self._active = 0

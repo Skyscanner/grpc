@@ -32,7 +32,10 @@ cdef class CallbackFailureHandler:
         if future_loop == _current_io_loop().asyncio_loop():
             future.set_exception(exception)
         else:
-            future_loop.call_soon_threadsafe(future.set_exception, exception)
+            def next_loop_iteration():
+                future_loop.call_soon_threadsafe(future.set_exception, exception)
+
+            asyncio.get_event_loop().call_soon(next_loop_iteration)
 
 
 cdef class CallbackWrapper:
@@ -69,7 +72,10 @@ cdef class CallbackWrapper:
             if waiter_loop == _current_io_loop().asyncio_loop():
                 waiter.set_result(None)
             else:
-                waiter_loop.call_soon_threadsafe(waiter.set_result, None)
+                def next_loop_iteration():
+                    waiter_loop.call_soon_threadsafe(waiter.set_result, None)
+
+                asyncio.get_event_loop().call_soon(next_loop_iteration)
         cpython.Py_DECREF(<object>context.callback_wrapper)
 
     cdef grpc_experimental_completion_queue_functor *c_functor(self):

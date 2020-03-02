@@ -128,7 +128,10 @@ cdef class _AsyncioSocket:
             self._grpc_connect_cb = grpc_connect_cb
             self._task_connect.add_done_callback(self._connect_cb)
 
-        self._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            self._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)
 
     cdef void read(self, char * buffer_, size_t length, grpc_custom_read_callback grpc_read_cb):
         assert not self._task_read
@@ -138,7 +141,10 @@ cdef class _AsyncioSocket:
             self._read_buffer = buffer_
             self._task_read =  self._loop.create_task(self._async_read(length))
 
-        self._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            self._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)
 
 
     async def _async_write(self, bytearray outbound_buffer):
@@ -177,7 +183,10 @@ cdef class _AsyncioSocket:
             self._grpc_write_cb = grpc_write_cb
             self._task_write = self._loop.create_task(self._async_write(outbound_buffer))
 
-        self._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            self._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)
 
     cdef bint is_connected(self):
         return self._reader and not self._reader._transport.is_closing()
@@ -227,7 +236,10 @@ cdef class _AsyncioSocket:
 
             self._loop.create_task(create_asyncio_server())
 
-        self._loop.call_soon_threadsafe(callback)
+        def next_loop_iteration():
+            self._loop.call_soon_threadsafe(callback)
+
+        asyncio.get_event_loop().call_soon(next_loop_iteration)
 
     cdef accept(self,
                 grpc_custom_socket* grpc_socket_client,
